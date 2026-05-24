@@ -768,3 +768,109 @@ body::before {
     fluid-flow 3s ease-in-out infinite,
     wave-pulse 3.5s ease-in-out infinite;
 }
+
+/* ─── Premium Glow Divider ─── */
+.divider-glow {
+  position: relative;
+  height: 1px;
+}
+.divider-glow::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+}
+.divider-glow::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(96,165,250,0.65) 18%,
+    rgba(212,176,104,0.50) 50%,
+    rgba(96,165,250,0.65) 82%,
+    transparent 100%
+  );
+  background-size: 300% 100%;
+  animation: glow-sweep 9s ease-in-out infinite;
+}
+@keyframes glow-sweep {
+  0%, 100% { background-position: 0% 50%; opacity: 0.55; }
+  50%       { background-position: 100% 50%; opacity: 1; }
+}
+
+/* ─── Stat count gradient text ─── */
+.stat-num {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.032em;
+  line-height: 1;
+  background: linear-gradient(118deg,
+    #F8FAFC 0%,
+    #60A5FA 35%,
+    #D4B068 65%,
+    #F8FAFC 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: grad 12s ease-in-out infinite;
+}
+
+/* ─── Ticker / marquee 2× speed variant ─── */
+.marquee-track-fast {
+  display: flex;
+  gap: 0;
+  animation: marquee-x 28s linear infinite;
+  will-change: transform;
+}
+
+/* ─── Card border shimmer on hover ─── */
+@keyframes border-shimmer {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 200% 50%; }
+}
+
+/* ─── Fade-in up with blur ─── */
+@keyframes blur-in {
+  from { opacity: 0; transform: translateY(18px); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+}
+
+/* ─── Soft color pulse (for accented stat values) ─── */
+@keyframes accent-pulse {
+  0%, 100% { text-shadow: 0 0 0px transparent; }
+  50%       { text-shadow: 0 0 20px rgba(96,165,250,0.35); }
+}
+
+/* ─── Floating particle dots ─── */
+@keyframes float-dot {
+  0%, 100% { transform: translateY(0px) scale(1);   opacity: 0.35; }
+  33%       { transform: translateY(-12px) scale(1.15); opacity: 0.7; }
+  66%       { transform: translateY(6px)  scale(0.9);  opacity: 0.25; }
+}
+.float-dot { animation: float-dot 5s ease-in-out infinite; }
+
+/* ─── Glow card border (gold variant) ─── */
+.card-gold-hover:hover {
+  border-color: rgba(212,176,104,0.30) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.50),
+    0 0 0 1px rgba(212,176,104,0.18),
+    0 0 40px rgba(212,176,104,0.06) !important;
+}
+.card-emerald-hover:hover {
+  border-color: rgba(16,185,129,0.30) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.50),
+    0 0 0 1px rgba(16,185,129,0.18),
+    0 0 40px rgba(16,185,129,0.06) !important;
+}
+.card-purple-hover:hover {
+  border-color: rgba(139,92,246,0.30) !important;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.50),
+    0 0 0 1px rgba(139,92,246,0.18),
+    0 0 40px rgba(139,92,246,0.06) !important;
+}

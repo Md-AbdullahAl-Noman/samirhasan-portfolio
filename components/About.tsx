@@ -156,6 +156,48 @@ export default function About() {
               <span className="italic text-gradient">Founder second.</span>
             </motion.h2>
 
+            {/* Metrics row */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.12, duration: 0.8, ease: [0.2, 0.6, 0.2, 1] }}
+              className="flex items-center gap-0 -mt-2"
+            >
+              {[
+                { val: '4+', label: 'Companies', delay: 0 },
+                { val: '2020', label: 'Since', delay: 0.07 },
+                { val: '100+', label: 'Shipped', delay: 0.14 },
+              ].map((m, i) => (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 12 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.2 + m.delay, duration: 0.7, ease: [0.2, 0.6, 0.2, 1] }}
+                  className="flex items-center"
+                >
+                  <span className="flex flex-col px-5 first:pl-0">
+                    <span
+                      className="stat-num"
+                      style={{ fontSize: 'clamp(28px, 3vw, 38px)' }}
+                    >
+                      {m.val}
+                    </span>
+                    <span className="text-[10px] font-mono tracking-[0.20em] uppercase text-ink-3 mt-1">
+                      {m.label}
+                    </span>
+                  </span>
+                  {i < 2 && (
+                    <span
+                      className="h-7 w-px flex-shrink-0"
+                      style={{ background: 'var(--border-md)' }}
+                    />
+                  )}
+                </motion.span>
+              ))}
+            </motion.div>
+
             <div className="space-y-6">
               {[
                 `I grew up believing that the best technology is invisible — it disappears into the fabric of how you think, work, and move through the world. That belief is the thread running through everything I've built.`,
