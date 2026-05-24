@@ -170,12 +170,43 @@ export default function Hero() {
             </a>
           </motion.div>
 
+          {/* Stats row */}
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.55, duration: 0.85, ease }}
+            className="mt-9 flex items-center"
+          >
+            {[
+              { val: '4+', label: 'Ventures' },
+              { val: '5yr', label: 'Building' },
+              { val: '∞', label: 'Vision' },
+            ].map((s, i) => (
+              <span key={i} className="flex items-center">
+                <span className="flex flex-col items-start px-4 first:pl-0">
+                  <span className="stat-num" style={{ fontSize: 'clamp(20px, 2.4vw, 26px)' }}>
+                    {s.val}
+                  </span>
+                  <span className="text-[9.5px] font-mono tracking-[0.22em] uppercase text-ink-3 mt-1.5">
+                    {s.label}
+                  </span>
+                </span>
+                {i < 2 && (
+                  <span
+                    className="h-6 w-px flex-shrink-0"
+                    style={{ background: 'var(--border-md)' }}
+                  />
+                )}
+              </span>
+            ))}
+          </motion.div>
+
           {/* Live status */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.7, duration: 0.8 }}
-            className="mt-8 inline-flex items-center gap-2.5 text-[11.5px] font-mono tracking-wide text-ink-3"
+            transition={{ delay: 1.9, duration: 0.8 }}
+            className="mt-7 inline-flex items-center gap-2.5 text-[11.5px] font-mono tracking-wide text-ink-3"
           >
             <span className="pulse-dot-wrap">
               <span className="dot" />
