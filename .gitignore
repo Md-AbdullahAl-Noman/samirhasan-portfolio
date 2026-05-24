@@ -6,4 +6,6 @@ build/
 .DS_Store
 *.log
 .vercel
+.env
+.env.local
 next-env.d.ts
