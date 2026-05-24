@@ -192,7 +192,7 @@ export default function Hero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2.0 }}
-        className="relative z-10 mt-auto flex justify-center pb-10"
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex justify-center"
       >
         <div className="flex flex-col items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-ink-3">
           <span>Scroll</span>
