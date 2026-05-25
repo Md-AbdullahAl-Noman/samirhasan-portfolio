@@ -4,53 +4,45 @@ import { useEffect, useRef, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BPM  = 60;
-const BEAT = 60 / BPM; // 1.0 s per beat — slow, unhurried
+const BEAT = 60 / BPM;
 
 type Note = { freq: number; beats: number };
 
-/* ── D natural minor melody — calm, flowing, mature ──────────────── */
-/* Dm7 → Bbmaj7 → Fmaj7 → Am7  (the "dreamy lounge" progression)   */
 const MELODY: Note[] = [
-  // Phrase 1 – gentle opening (over Dm)
-  { freq: 440.00, beats: 2   }, // A4
-  { freq: 349.23, beats: 2   }, // F4
-  { freq: 440.00, beats: 1.5 }, // A4
-  { freq: 392.00, beats: 0.5 }, // G4
-  { freq: 440.00, beats: 1   }, // A4
-  { freq: 392.00, beats: 1   }, // G4
-  // Phrase 2 – warm descent (over Bb)
-  { freq: 349.23, beats: 2   }, // F4
-  { freq: 329.63, beats: 1   }, // E4
-  { freq: 293.66, beats: 1   }, // D4
-  { freq: 349.23, beats: 3   }, // F4 (hold)
-  { freq: 293.66, beats: 1   }, // D4
-  // Phrase 3 – expressive rise (over F → Am)
-  { freq: 392.00, beats: 2   }, // G4
-  { freq: 440.00, beats: 2   }, // A4
-  { freq: 466.16, beats: 2   }, // Bb4 — the expressive peak
-  { freq: 440.00, beats: 2   }, // A4
-  // Phrase 4 – resolution
-  { freq: 392.00, beats: 2   }, // G4
-  { freq: 349.23, beats: 1   }, // F4
-  { freq: 392.00, beats: 1   }, // G4
-  { freq: 440.00, beats: 4   }, // A4 — long breath before loop
-]; // 32 beats total
-
-/* ── Deep bass roots (8 beats each = 32 beats) ───────────────────── */
-const BASS: Note[] = [
-  { freq:  73.42, beats: 8 }, // D2  — Dm
-  { freq:  58.27, beats: 8 }, // Bb1 — Bb
-  { freq:  87.31, beats: 8 }, // F2  — F
-  { freq: 110.00, beats: 8 }, // A2  — Am
+  { freq: 440.00, beats: 2   },
+  { freq: 349.23, beats: 2   },
+  { freq: 440.00, beats: 1.5 },
+  { freq: 392.00, beats: 0.5 },
+  { freq: 440.00, beats: 1   },
+  { freq: 392.00, beats: 1   },
+  { freq: 349.23, beats: 2   },
+  { freq: 329.63, beats: 1   },
+  { freq: 293.66, beats: 1   },
+  { freq: 349.23, beats: 3   },
+  { freq: 293.66, beats: 1   },
+  { freq: 392.00, beats: 2   },
+  { freq: 440.00, beats: 2   },
+  { freq: 466.16, beats: 2   },
+  { freq: 440.00, beats: 2   },
+  { freq: 392.00, beats: 2   },
+  { freq: 349.23, beats: 1   },
+  { freq: 392.00, beats: 1   },
+  { freq: 440.00, beats: 4   },
 ];
 
-/* ── Lush 7th chord pads (8 beats each = 32 beats) ──────────────── */
+const BASS: Note[] = [
+  { freq:  73.42, beats: 8 },
+  { freq:  58.27, beats: 8 },
+  { freq:  87.31, beats: 8 },
+  { freq: 110.00, beats: 8 },
+];
+
 type Chord = { freqs: number[]; beats: number };
 const CHORDS: Chord[] = [
-  { freqs: [146.83, 174.61, 220.00, 261.63], beats: 8 }, // Dm7:    D3 F3 A3 C4
-  { freqs: [116.54, 146.83, 174.61, 220.00], beats: 8 }, // Bbmaj7: Bb2 D3 F3 A3
-  { freqs: [174.61, 220.00, 261.63, 329.63], beats: 8 }, // Fmaj7:  F3 A3 C4 E4
-  { freqs: [220.00, 261.63, 329.63, 392.00], beats: 8 }, // Am7:    A3 C4 E4 G4
+  { freqs: [146.83, 174.61, 220.00, 261.63], beats: 8 },
+  { freqs: [116.54, 146.83, 174.61, 220.00], beats: 8 },
+  { freqs: [174.61, 220.00, 261.63, 329.63], beats: 8 },
+  { freqs: [220.00, 261.63, 329.63, 392.00], beats: 8 },
 ];
 
 function makeReverb(ctx: AudioContext): ConvolverNode {
@@ -66,7 +58,6 @@ function makeReverb(ctx: AudioContext): ConvolverNode {
   return conv;
 }
 
-/* Sine wave + overtones + vibrato — warm, human, not thin         */
 function scheduleTone(
   ctx: AudioContext,
   dest: AudioNode,
@@ -78,13 +69,11 @@ function scheduleTone(
 ) {
   const noteEnd = startTime + durSec;
 
-  // Overtone stacks per voice type
   const partials: Array<{ mult: number; vol: number }> =
     kind === 'melody' ? [{ mult: 1, vol: 0.09 }, { mult: 2, vol: 0.020 }, { mult: 3, vol: 0.006 }]
     : kind === 'bass' ? [{ mult: 1, vol: 0.075 }, { mult: 2, vol: 0.010 }]
     :                   [{ mult: 1, vol: 0.016 }];
 
-  // ADSR — long release so notes blur into each other (legato / sustain-pedal feel)
   const [attack, decay, sustain, release] =
     kind === 'melody' ? [0.09,  0.50, 0.72, 2.4]
     : kind === 'bass' ? [0.20,  0.80, 0.55, 2.0]
@@ -97,15 +86,14 @@ function scheduleTone(
     osc.type = 'sine';
     osc.frequency.value = freq * mult;
 
-    // Subtle vibrato on melody fundamentals — adds human warmth
     if (kind === 'melody' && mult === 1) {
       const vibLfo  = ctx.createOscillator();
       const vibGain = ctx.createGain();
       vibLfo.frequency.value = 4.5;
-      vibGain.gain.value     = freq * 0.005; // ~1 cent depth
+      vibGain.gain.value     = freq * 0.005;
       vibLfo.connect(vibGain);
       vibGain.connect(osc.frequency);
-      vibLfo.start(startTime + 0.40); // starts after the attack settles
+      vibLfo.start(startTime + 0.40);
       vibLfo.stop(noteEnd + release + 0.1);
     }
 
@@ -123,7 +111,9 @@ function scheduleTone(
   });
 }
 
-export default function MusicPlayer() {
+type Props = { audioChoice: boolean | null };
+
+export default function MusicPlayer({ audioChoice }: Props) {
   const [playing, setPlaying] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [hovered, setHovered] = useState(false);
@@ -216,6 +206,14 @@ export default function MusicPlayer() {
     tickerRef.current = setInterval(tick, 25);
   }, []);
 
+  // Auto-start or stay silent based on user's choice from the loader
+  useEffect(() => {
+    if (audioChoice === true) {
+      startMusic();
+      setPlaying(true);
+    }
+  }, [audioChoice]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const toggle = useCallback(() => {
     if (playing) { stopMusic(); setPlaying(false); }
     else         { startMusic(); setPlaying(true); }
@@ -226,13 +224,14 @@ export default function MusicPlayer() {
     ctxRef.current?.close();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (!mounted) return null;
+  // Only render after the loader has been dismissed
+  if (!mounted || audioChoice === null) return null;
 
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.7, y: 14 }}
       animate={{ opacity: 1, scale: 1,   y: 0  }}
-      transition={{ delay: 2.8, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+      transition={{ delay: 0.3, duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
       className="fixed bottom-6 right-6 z-50"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -251,7 +250,7 @@ export default function MusicPlayer() {
               style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.35)' }}
             >
               <span className="text-[10px] font-mono tracking-[0.18em] uppercase" style={{ color: 'var(--text-3)' }}>
-                {playing ? 'ambient · on' : 'ambient music'}
+                {playing ? 'ambient · on' : 'ambient · off'}
               </span>
             </div>
             <span
@@ -262,9 +261,16 @@ export default function MusicPlayer() {
         )}
       </AnimatePresence>
 
-      <button
+      {/* Button blinks when music is off */}
+      <motion.button
         onClick={toggle}
         aria-label={playing ? 'Stop ambient music' : 'Play ambient music'}
+        animate={!playing ? { opacity: [1, 0.38, 1] } : { opacity: 1 }}
+        transition={
+          !playing
+            ? { duration: 1.6, repeat: Infinity, ease: 'easeInOut' }
+            : { duration: 0.3 }
+        }
         className="relative flex items-center justify-center w-11 h-11 rounded-full transition-all duration-300 hover:scale-110 active:scale-[0.93] focus:outline-none"
         style={{
           background: playing
@@ -317,7 +323,7 @@ export default function MusicPlayer() {
             />
           ))}
         </div>
-      </button>
+      </motion.button>
     </motion.div>
   );
 }

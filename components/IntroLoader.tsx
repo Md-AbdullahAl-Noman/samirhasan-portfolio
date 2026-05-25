@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 
 const ease = [0.2, 0.6, 0.2, 1] as const;
 
+type Props = { onEnter: (withAudio: boolean) => void };
+
 function WavyText({ text, delay, gradient = false }: { text: string; delay: number; gradient?: boolean }) {
   return (
     <div className="flex justify-center">
@@ -95,16 +97,37 @@ function Corner({ pos }: { pos: 'tl' | 'tr' | 'bl' | 'br' }) {
   );
 }
 
-export default function IntroLoader() {
-  const [mounted, setMounted]   = useState(false);
-  const [done, setDone]         = useState(false);
-  const [pct, setPct]           = useState(0);
-  const raw                     = useMotionValue(0);
+function IconWaveform() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function IconMuted() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path d="M11 5L6 9H2v6h4l5 4V5z" fill="currentColor" />
+      <line x1="23" y1="9" x2="17" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      <line x1="17" y1="9" x2="23" y2="15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export default function IntroLoader({ onEnter }: Props) {
+  const [mounted, setMounted]           = useState(false);
+  const [done, setDone]                 = useState(false);
+  const [showButtons, setShowButtons]   = useState(false);
+  const [pct, setPct]                   = useState(0);
+  const raw                             = useMotionValue(0);
 
   useEffect(() => {
     setMounted(true);
     document.body.style.overflow = 'hidden';
-    const t = setTimeout(() => setDone(true), 2750);
+    const t = setTimeout(() => setShowButtons(true), 2750);
     return () => {
       clearTimeout(t);
       document.body.style.overflow = '';
@@ -125,6 +148,11 @@ export default function IntroLoader() {
     if (done) document.body.style.overflow = '';
   }, [done]);
 
+  const handleEnter = (withAudio: boolean) => {
+    onEnter(withAudio);
+    setDone(true);
+  };
+
   if (!mounted) return null;
 
   return (
@@ -140,7 +168,7 @@ export default function IntroLoader() {
               'radial-gradient(ellipse 80% 60% at 50% 50%, #0F1A2E 0%, #0B1220 70%, #070A14 100%)',
           }}
         >
-          {/* Premium top progress bar (gold-blue gradient) */}
+          {/* Premium top progress bar */}
           <motion.div
             className="absolute top-0 left-0 h-[2px] pointer-events-none z-30"
             style={{
@@ -173,7 +201,7 @@ export default function IntroLoader() {
             }}
           />
 
-          {/* Premium centre glow — sapphire with champagne accent */}
+          {/* Centre glow */}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div
               className="h-[60vh] w-[65vw] rounded-full"
@@ -194,7 +222,7 @@ export default function IntroLoader() {
             />
           </div>
 
-          {/* Scan line – wavy sweep top → bottom */}
+          {/* Scan line */}
           <motion.div
             className="pointer-events-none absolute left-0 right-0 h-[2px] z-20 wave-scan-line"
             style={{
@@ -216,8 +244,7 @@ export default function IntroLoader() {
 
           {/* ── Main content ── */}
           <div className="relative z-10 flex flex-col items-center">
-
-            {/* Name with wavy animation */}
+            {/* Name */}
             <motion.div
               className="flex flex-col items-center text-center -space-y-1 sm:-space-y-2"
               initial={{ opacity: 0 }}
@@ -227,7 +254,6 @@ export default function IntroLoader() {
               <div className="font-display text-white leading-[1.0] tracking-ultra" style={{ color: '#F8FAFC' }}>
                 <WavyText text="Samir" delay={0.44} />
               </div>
-
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -238,7 +264,7 @@ export default function IntroLoader() {
               </motion.div>
             </motion.div>
 
-            {/* Premium expand line under name */}
+            {/* Divider line */}
             <motion.div
               className="mt-6 h-px"
               style={{
@@ -263,45 +289,94 @@ export default function IntroLoader() {
             >
               <span
                 className="h-px w-8"
-                style={{
-                  background:
-                    'linear-gradient(90deg, transparent, rgba(212,176,104,0.4))',
-                }}
+                style={{ background: 'linear-gradient(90deg, transparent, rgba(212,176,104,0.4))' }}
               />
               Founder · Luminar Technology
               <span
                 className="h-px w-8"
-                style={{
-                  background:
-                    'linear-gradient(90deg, rgba(212,176,104,0.4), transparent)',
-                }}
+                style={{ background: 'linear-gradient(90deg, rgba(212,176,104,0.4), transparent)' }}
               />
             </motion.div>
+
+            {/* ── Audio choice buttons ── */}
+            <AnimatePresence>
+              {showButtons && (
+                <motion.div
+                  key="enter-btns"
+                  initial={{ opacity: 0, y: 18 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.55, ease }}
+                  className="mt-10 flex flex-col sm:flex-row items-center gap-3"
+                >
+                  {/* Enter with Audio */}
+                  <motion.button
+                    onClick={() => handleEnter(true)}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full font-mono text-[10px] tracking-[0.28em] uppercase focus:outline-none"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(37,99,235,0.22) 0%, rgba(96,165,250,0.10) 100%)',
+                      border: '1px solid rgba(96,165,250,0.50)',
+                      color: '#93C5FD',
+                      boxShadow: '0 0 20px rgba(96,165,250,0.20), 0 4px 16px rgba(0,0,0,0.5)',
+                      backdropFilter: 'blur(12px)',
+                    }}
+                  >
+                    <IconWaveform />
+                    Enter with Audio
+                  </motion.button>
+
+                  {/* Enter without Audio */}
+                  <motion.button
+                    onClick={() => handleEnter(false)}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="flex items-center gap-2 px-6 py-3 rounded-full font-mono text-[10px] tracking-[0.28em] uppercase focus:outline-none"
+                    style={{
+                      background: 'rgba(11,18,32,0.55)',
+                      border: '1px solid rgba(226,232,240,0.12)',
+                      color: 'rgba(226,232,240,0.40)',
+                      boxShadow: '0 4px 16px rgba(0,0,0,0.4)',
+                      backdropFilter: 'blur(12px)',
+                    }}
+                  >
+                    <IconMuted />
+                    Enter without Audio
+                  </motion.button>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
-          {/* Progress counter – bottom right */}
-          <motion.div
-            className="absolute bottom-7 right-8 sm:bottom-9 sm:right-10 font-mono text-[11px] sm:text-[13px] tracking-[0.20em] tabular-nums flex items-center gap-2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.88, duration: 0.35 }}
-          >
-            <span style={{ color: 'rgba(96,165,250,0.5)' }}>LOADING</span>
-            <span
-              style={{
-                background:
-                  'linear-gradient(90deg, #60A5FA, #D4B068)',
-                WebkitBackgroundClip: 'text',
-                backgroundClip: 'text',
-                color: 'transparent',
-                fontWeight: 600,
-              }}
-            >
-              {String(pct).padStart(3, '0')}
-            </span>
-          </motion.div>
+          {/* Progress counter – fades out when buttons appear */}
+          <AnimatePresence>
+            {!showButtons && (
+              <motion.div
+                key="progress"
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.4 }}
+                className="absolute bottom-7 right-8 sm:bottom-9 sm:right-10 font-mono text-[11px] sm:text-[13px] tracking-[0.20em] tabular-nums flex items-center gap-2"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+              >
+                <span style={{ color: 'rgba(96,165,250,0.5)' }}>LOADING</span>
+                <span
+                  style={{
+                    background: 'linear-gradient(90deg, #60A5FA, #D4B068)',
+                    WebkitBackgroundClip: 'text',
+                    backgroundClip: 'text',
+                    color: 'transparent',
+                    fontWeight: 600,
+                  }}
+                >
+                  {String(pct).padStart(3, '0')}
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          {/* Bottom label – center */}
+          {/* Bottom label */}
           <motion.div
             className="absolute bottom-7 sm:bottom-9 left-1/2 -translate-x-1/2 font-mono text-[9px] sm:text-[10px] tracking-[0.36em] uppercase whitespace-nowrap"
             style={{ color: 'rgba(226,232,240,0.45)' }}

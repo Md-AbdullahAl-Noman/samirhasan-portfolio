@@ -8,8 +8,7 @@ import './globals.css';
 import SmoothScroll from '@/components/SmoothScroll';
 import CursorGlow from '@/components/CursorGlow';
 import Navigation from '@/components/Navigation';
-import IntroLoader from '@/components/IntroLoader';
-import MusicPlayer from '@/components/MusicPlayer';
+import ClientShell from '@/components/ClientShell';
 
 const displayFont = Bricolage_Grotesque({
   subsets: ['latin'],
@@ -56,10 +55,9 @@ export default function RootLayout({
     >
       <body>
         <SmoothScroll>
-          <IntroLoader />
+          <ClientShell />
           <CursorGlow />
           <Navigation />
-          <MusicPlayer />
           {children}
         </SmoothScroll>
       </body>
